@@ -4,7 +4,7 @@ const bcryptjs = require('bcryptjs');
 
 const getUsers = async(req = request, res = response) => {
 	
-	const {since = 0, limit = 5} = req.query;
+	const {since = 0, limit = 10} = req.query;
 	const query = { state: true };
 
 /* 	const users = await User.find(query)
@@ -57,18 +57,20 @@ const putUser = async(req, res = response) => {
 		user
 	});
 }
-//52
+
 
 const deleteUser = async(req, res = response) => {
 	
 	const {id} = req.params;
-	
-	//fisicamente
-	//const user = await User.findByIdAndDelete(id);
+	const userAuth = req.userAuth;
 
+	//const user = await User.findByIdAndDelete(id);
 	const user = await User.findByIdAndUpdate(id, {state: false});
 
-	res.json(user);
+	res.json({
+		user, 
+		userAuth
+	});
 }
 
 module.exports = { 

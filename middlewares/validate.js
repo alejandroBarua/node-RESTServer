@@ -1,4 +1,4 @@
-const {validationResult} = require('express-validator')
+const { validationResult } = require('express-validator')
 
 
 const validate = (req, res, next) => {
@@ -8,4 +8,4 @@ const validate = (req, res, next) => {
 	next();
 }
 
-module.exports = { validate }
+module.exports = { validate };
