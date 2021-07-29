@@ -1,8 +1,7 @@
-const { request, response } = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const validateJWT = async(req = request, res = response, next) => {
+const validateJWT = async(req, res, next) => {
 
 	const token = req.header('x-token');
 	if(!token) return res.status(401).json({msg: 'there is no token in the request'});
@@ -10,7 +9,7 @@ const validateJWT = async(req = request, res = response, next) => {
 	try {
 		
 		const { id } = jwt.verify(token, process.env.SECRET_KEY);
-		req.userAuth = await User.findById(id);
+		req.user = await User.findById(id);
 
 		next();
 

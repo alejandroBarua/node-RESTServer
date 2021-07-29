@@ -1,8 +1,7 @@
-const { request, response } = require('express');
 const User = require('../models/user');
 const bcryptjs = require('bcryptjs');
 
-const getUsers = async(req = request, res = response) => {
+const getUsers = async(req, res) => {
 	
 	const {since = 0, limit = 10} = req.query;
 	const query = { state: true };
@@ -26,7 +25,7 @@ const getUsers = async(req = request, res = response) => {
 	});
 }
 
-const postUser = async(req, res = response) => {
+const postUser = async(req, res) => {
 	
 	const {name, email, password, role} = req.body;
 	const user = new User({name, email, password, role});
@@ -41,7 +40,7 @@ const postUser = async(req, res = response) => {
 	});
 }
 
-const putUser = async(req, res = response) => {
+const putUser = async(req, res) => {
 
 	const {id} = req.params;
 	const {google, email, password, ...other} = req.body;
@@ -59,17 +58,17 @@ const putUser = async(req, res = response) => {
 }
 
 
-const deleteUser = async(req, res = response) => {
+const deleteUser = async(req, res) => {
 	
 	const {id} = req.params;
-	const userAuth = req.userAuth;
+	const user = req.user;
 
 	//const user = await User.findByIdAndDelete(id);
-	const user = await User.findByIdAndUpdate(id, {state: false});
+	const userDB = await User.findByIdAndUpdate(id, {state: false});
 
 	res.json({
-		user, 
-		userAuth
+		userDB, 
+		user
 	});
 }
 

@@ -1,10 +1,9 @@
-const { response } = require('express');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 const { generateJWT } = require('../helpers/generate-jwt');
 const googleVerify = require('../helpers/google-verify');
 
-const login = async(req, res = response) => {
+const login = async(req, res) => {
 
 	const { email, password } = req.body;
 
@@ -30,7 +29,7 @@ const login = async(req, res = response) => {
 
 }
 
-const googleSignIn = async(req, res = response) => {
+const googleSignIn = async(req, res) => {
 
 	const { id_token } = req.body;
 	

@@ -3,17 +3,17 @@ const router = Router();
 
 const {check} = require('express-validator');
 
-const { validate } = require('../middlewares/validate');
+const { isValidations } = require('../middlewares/validations');
 const validateJWT = require('../middlewares/validate-jwt');
-const validateState = require('../middlewares/validate-state');
-const { isAdminRole, isRole } = require('../middlewares/validate-roles');
+const isUserState = require('../middlewares/user-state');
+const { isAdminRole, isUserRole } = require('../middlewares/user-roles');
 
 
 const { 
-	isValidRole, 
-	isValidEmail,
-	isValidId,
-} = require('../helpers/validations');
+	findUserByEmail,
+	findUserById,
+	isValidRole,
+} = require('../helpers/validate-user');
 
 const {	
 	getUsers,
@@ -29,27 +29,29 @@ router.post('/',[
 	check('name', 'the name is required').not().isEmpty(),
 	check('password', 'the password must be more than 6 characters').isLength({min: 6}),
 	check('email', 'invalid email').isEmail(),
-	check('email').custom(isValidEmail),
+	check('email').custom(findUserByEmail),
 	//check('role', 'invalid role').isIn(['ADMIN_ROLE', 'USER_ROLE']), 
 	check('role').custom(isValidRole),
-	validate
+	isValidations
 ] , postUser);
 
 router.put('/:id', [
-	check('id').isMongoId(),
-	check('id').custom(isValidId),
+	validateJWT,
+	isUserState,
+	check('id', 'invalid id').isMongoId(),
+	check('id').custom(findUserById),
 	check('role').custom(isValidRole),
-	validate
+	isValidations
 ] , putUser);
 
 router.delete('/:id', [
 	validateJWT,
-	validateState,
+	isUserState,
 	//isAdminRole,
-	isRole('ADMIN_ROLE'),
+	isUserRole('ADMIN_ROLE'),
 	check('id').isMongoId(),
-	check('id').custom(isValidId),
-	validate
+	check('id').custom(findUserById),
+	isValidations
 ], deleteUser);
 
 module.exports = router;
