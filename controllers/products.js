@@ -1,11 +1,16 @@
-const { Product } = require('../models');
+const { Product, Category } = require('../models');
 
 const createProduct = async(req, res) => {
 
-	const name = req.body.name.toUpperCase();
+	const { name, description, price, category } = req.body;
+
+	const categoryDB = await Category.findOne({name: category.toUpperCase()});
 
 	const data = {
-		name,
+		name: name.toUpperCase(),
+		description,
+		price,
+		category: categoryDB._id,
 		user: req.user._id,
 	}
 
@@ -35,8 +40,52 @@ const getProducts = async(req, res) => {
 	});
 }
 
+
+const getProduct = async(req, res) => {
+
+	const {id} = req.params;
+	const product = await Product.findById(id)
+															 .populate('user', 'name')
+															 .populate('category', 'name');
+
+	res.json({
+		product
+	});
+}
+
+const putProduct = async(req, res) => {
+
+	const {id} = req.params;
+	const { name, category, ...data } = req.body;
+
+	const categoryDB = await Category.findOne({name: category.toUpperCase()});
+
+	data.name = name.toUpperCase();
+	data.category = categoryDB._id;
+	data.user = req.user._id;
+
+	const product = await Product.findByIdAndUpdate(id, data);
+
+	res.json({
+		product
+	});
+}
+
+const deleteProduct = async(req, res) => {
+	
+	const {id} = req.params;
+	const product = await Product.findByIdAndUpdate(id, {state: false});
+
+	res.json({
+		product
+	});
+}
+
 module.exports = {
 	createProduct,
 	getProducts,
+	getProduct,
+	putProduct,
+	deleteProduct
 
 }

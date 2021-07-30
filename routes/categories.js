@@ -5,15 +5,10 @@ const { check } = require('express-validator');
 
 const { isValidations } = require('../middlewares/validations');
 const validateJWT = require('../middlewares/validate-jwt');
-
-const { 
-	isCategoryState,
-	isNotCategoryDB
-} = require('../helpers/validate-category');
-
+const { isUserRole } = require('../middlewares/user-roles');
 const isUserState = require('../middlewares/user-state');
-const { isAdminRole, isUserRole } = require('../middlewares/user-roles');
 
+const { isCategoryState, isNotCategoryDB } = require('../helpers/validate-category');
 
 const { 
 	createCategory, 

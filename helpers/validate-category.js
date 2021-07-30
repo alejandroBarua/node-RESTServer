@@ -6,13 +6,6 @@ const isCategoryState = async(id) => {
 	if(!state) throw new Error(`the ID ${id} not exists`);
 }
 
-const isCategoryDB = async(name) => {
-	
-	const category = await  Category.findOne({name: name.toUpperCase()});
-	if(!category) throw new Error(`the category ${name} not exists`);
-
-}
-
 const isNotCategoryDB = async(name) => {
 	
 	const category = await  Category.findOne({name: name.toUpperCase()});
@@ -22,6 +15,5 @@ const isNotCategoryDB = async(name) => {
 
 module.exports = { 
 	isCategoryState,
-	isCategoryDB,
 	isNotCategoryDB
 }

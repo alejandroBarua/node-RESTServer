@@ -48,9 +48,9 @@ const getCategory = async(req, res) => {
 const putCategory = async(req, res) => {
 
 	const {id} = req.params;
-	const {state, user, ...data} = req.body;
-	data.name = data.name.toUpperCase();
-	data.user = req.user._id;
+	const {user, name, ...data} = req.body;
+	data.name = name.toUpperCase();
+	data.user = user._id;
 
 
 	const category = await  Category.findByIdAndUpdate(id, {data});
