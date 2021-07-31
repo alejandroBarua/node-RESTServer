@@ -6,11 +6,12 @@ const isCategoryState = async(id) => {
 	if(!state) throw new Error(`the ID ${id} not exists`);
 }
 
-const isNotCategoryDB = async(name) => {
+const isNotCategoryDB = async(name = '') => {
 	
-	const category = await  Category.findOne({name: name.toUpperCase()});
-	if(category) throw new Error(`${name} already exists`);
-
+	if(name){
+		const category = await  Category.findOne({name: name.toUpperCase()});
+		if(category) throw new Error(`${name} already exists`);
+	}
 }
 
 module.exports = { 

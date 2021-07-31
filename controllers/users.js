@@ -1,10 +1,10 @@
-const User = require('../models/user');
+const { User, Product } = require('../models');
 const bcryptjs = require('bcryptjs');
 
 const getUsers = async(req, res) => {
 	
 	const {since = 0, limit = 10} = req.query;
-	const query = { state: true };
+	const query = { state: true, role: "USER_ROLE" };
 
 /* 	const users = await User.find(query)
 												.skip(Number(since))
@@ -27,8 +27,8 @@ const getUsers = async(req, res) => {
 
 const postUser = async(req, res) => {
 	
-	const {name, email, password, role} = req.body;
-	const user = new User({name, email, password, role});
+	const {state, role, name, email, password} = req.body;
+	const user = new User({name, email, password});
 
 	const salt = bcryptjs.genSaltSync();
 	user.password = bcryptjs.hashSync(password, salt);
@@ -43,12 +43,7 @@ const postUser = async(req, res) => {
 const putUser = async(req, res) => {
 
 	const {id} = req.params;
-	const {google, email, password, ...other} = req.body;
-
-	if(password){
-		const salt = bcryptjs.genSaltSync();
-		other.password = bcryptjs.hashSync(password, salt);
-	}
+	const {role, google, email, password, ...other} = req.body;
 
 	const user = await  User.findByIdAndUpdate(id, other);
 
@@ -61,14 +56,14 @@ const putUser = async(req, res) => {
 const deleteUser = async(req, res) => {
 	
 	const {id} = req.params;
-	const user = req.user;
 
 	//const user = await User.findByIdAndDelete(id);
 	const userDB = await User.findByIdAndUpdate(id, {state: false});
+	await Product.updateMany({ user: id }, {state: false});
 
 	res.json({
 		userDB, 
-		user
+		
 	});
 }
 

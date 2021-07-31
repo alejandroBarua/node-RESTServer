@@ -5,7 +5,7 @@ const { check } = require('express-validator');
 
 const { isValidations } = require('../middlewares/validations');
 const validateJWT = require('../middlewares/validate-jwt');
-const { isUserRole } = require('../middlewares/user-roles');
+const { isAdminRole } = require('../middlewares/user-roles');
 const isUserState = require('../middlewares/user-state');
 
 const { isCategoryState, isNotCategoryDB } = require('../helpers/validate-category');
@@ -21,7 +21,6 @@ const {
 
 
 // public
-
 router.get('/', getCategories);
 
 // public
@@ -31,34 +30,31 @@ router.get('/:id',[
 	isValidations
 ], getCategory);
 
-// valid token
-// user state
+// admin role
 router.post('/', [
 	validateJWT,
 	isUserState,
+	isAdminRole,
 	check('name', 'the name is required').not().isEmpty(),
 	check('name').custom(isNotCategoryDB),
 	isValidations
 ], createCategory);
 
-// valid token
-// user state
+// admin role
 router.put('/:id',[
 	validateJWT,
 	isUserState,
+	isAdminRole,
 	check('id', 'invalid id').isMongoId(),
-	check('id').custom(isCategoryState),
-	check('name', 'the name is required').not().isEmpty(),
 	check('name').custom(isNotCategoryDB),
 	isValidations
 ], putCategory);
 
 // admin role
-// user state
 router.delete('/:id',[
 	validateJWT,
 	isUserState,
-	isUserRole('ADMIN_ROLE'),
+	isAdminRole,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isCategoryState),
 	isValidations

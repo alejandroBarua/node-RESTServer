@@ -7,10 +7,11 @@ const { check } = require('express-validator');
 
 const { isValidations } = require('../middlewares/validations');
 const validateJWT = require('../middlewares/validate-jwt');
-const { isUserRole } = require('../middlewares/user-roles');
+const { isAdminRole } = require('../middlewares/user-roles');
 const isUserState = require('../middlewares/user-state');
+const isProductOfUser = require('../middlewares/user-product');
 
-const { isNotProductDB, isProductState } = require('../helpers/validate-product');
+const { isProductState } = require('../helpers/validate-product');
 
 const { 
 	createProduct,
@@ -25,6 +26,7 @@ const {
 
 router.get('/', getProducts);
 
+// public
 router.get('/:id',[
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isProductState),
@@ -36,10 +38,10 @@ router.post('/', [
 	isUserState,
 	check('name', 'the name is required').not().isEmpty(),
 	check('category', 'the category is required').not().isEmpty(),
-	check('name').custom(isNotProductDB),
-	check('category').custom( async(name) => {
-		const category = await  Category.findOne({name: name.toUpperCase(), state: true});
-		if(!category) throw new Error(`the category ${name} not exists`);
+	check('category', 'invalid id').isMongoId(),
+	check('category').custom( async(id) => {
+		const { state } = await  Category.findById(id);
+		if(!state) throw new Error(`the category ${id} not exists`);
 	}),
 	isValidations
 ], createProduct);
@@ -47,14 +49,14 @@ router.post('/', [
 router.put('/:id', [
 	validateJWT,
 	isUserState,
+	isProductOfUser,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isProductState),
-	check('name', 'the name is required').not().isEmpty(),
-	check('category', 'the category is required').not().isEmpty(),
-	check('name').custom(isNotProductDB),
-	check('category').custom( async(name) => {
-		const category = await  Category.findOne({name: name.toUpperCase(), state: true});
-		if(!category) throw new Error(`the category ${name} not exists`);
+	check('category').custom( async(id='') => {
+		if(id){
+			const { state } = await  Category.findById(id);
+			if(!state) throw new Error(`the category ${id} not exists`);
+		}
 	}),
 	isValidations
 ], putProduct);
@@ -62,7 +64,7 @@ router.put('/:id', [
 router.delete('/:id',[
 	validateJWT,
 	isUserState,
-	isUserRole('ADMIN_ROLE'),
+	isAdminRole,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isProductState),
 	isValidations

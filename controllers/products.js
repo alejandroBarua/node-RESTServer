@@ -2,17 +2,13 @@ const { Product, Category } = require('../models');
 
 const createProduct = async(req, res) => {
 
-	const { name, description, price, category } = req.body;
+	const { state, user, name, category, ...data } = req.body;
 
-	const categoryDB = await Category.findOne({name: category.toUpperCase()});
+	const categoryDB = await Category.findById(category);
 
-	const data = {
-		name: name.toUpperCase(),
-		description,
-		price,
-		category: categoryDB._id,
-		user: req.user._id,
-	}
+	data.name = name.toUpperCase();
+	data.category = categoryDB._id;
+	data.user = req.user._id;
 
 	const product = new Product(data);
 	await product.save();
@@ -56,12 +52,14 @@ const getProduct = async(req, res) => {
 const putProduct = async(req, res) => {
 
 	const {id} = req.params;
-	const { name, category, ...data } = req.body;
+	const { user, name, category, ...data } = req.body;
 
-	const categoryDB = await Category.findOne({name: category.toUpperCase()});
+	if(category){
+		const categoryDB = await Category.findById({id: category});
+		data.category = categoryDB._id;
+	}
 
-	data.name = name.toUpperCase();
-	data.category = categoryDB._id;
+	if(name) data.name = name.toUpperCase();
 	data.user = req.user._id;
 
 	const product = await Product.findByIdAndUpdate(id, data);

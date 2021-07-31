@@ -1,11 +1,10 @@
-const { Category } = require('../models');
+const { Category, Product } = require('../models');
 
 const createCategory = async(req, res) => {
 
-	const name = req.body.name.toUpperCase();
-
+	const {state, user, name} = req.body;
 	const data = {
-		name,
+		name: name.toUpperCase(),
 		user: req.user._id
 	}
 
@@ -48,12 +47,13 @@ const getCategory = async(req, res) => {
 const putCategory = async(req, res) => {
 
 	const {id} = req.params;
-	const {user, name, ...data} = req.body;
-	data.name = name.toUpperCase();
-	data.user = user._id;
+	const { user, name, ...data } = req.body;
 
+	if(name) data.name = name.toUpperCase();
+	data.user = req.user._id;
 
-	const category = await  Category.findByIdAndUpdate(id, {data});
+	console.log(id, data)
+	const category = await  Category.findByIdAndUpdate(id, data);
 
 	res.json({
 		category
@@ -65,6 +65,7 @@ const deleteCategory = async(req, res) => {
 	const {id} = req.params;
 
 	const category = await Category.findByIdAndUpdate(id, {state: false});
+	await Product.updateMany({ category: id }, {state: false});
 
 	res.json({
 		category

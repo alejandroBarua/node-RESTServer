@@ -7,20 +7,8 @@ const isAdminRole = async(req, res, next) => {
 	next();
 }
 
-const isUserRole = (...roles) => {
-
-	return (req, res, next) => {
-		
-		if(!roles.includes(req.user.role)) return res.status(401).json({msg: 'invalid role'});
-
-		next();
-	}
-	
-}
-
 
 module.exports = {
 	isAdminRole,
-	isUserRole
 
 };
