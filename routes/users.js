@@ -16,6 +16,7 @@ const {
 
 const {	
 	getUsers,
+	getUser,
 	postUser,
 	putUser,
 	deleteUser
@@ -29,6 +30,15 @@ router.get('/',[
 	isAdminRole,
 	isValidations
 ], getUsers);
+
+// id
+// email
+router.get('/:info',[
+	validateJWT,
+	isUserState,
+	isAdminRole,
+	isValidations
+], getUser);
 
 router.post('/',[
 	check('email', 'invalid email').isEmail(),
