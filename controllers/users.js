@@ -87,8 +87,9 @@ const deleteUser = async(req, res) => {
 	const {id} = req.params;
 
 	//const user = await User.findByIdAndDelete(id);
-	const userDB = await User.findByIdAndUpdate(id, {state: false});
-	await Product.updateMany({ user: id }, {state: false});
+	const query = {state: false};
+	const userDB = await User.findByIdAndUpdate(id, query);
+	await Product.updateMany({ user: id }, query);
 
 	res.json({
 		userDB, 

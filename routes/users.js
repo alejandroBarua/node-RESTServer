@@ -2,17 +2,12 @@ const { Router} = require('express');
 const router = Router();
 
 const {check} = require('express-validator');
-
 const { isValidations } = require('../middlewares/validations');
-const validateJWT = require('../middlewares/validate-jwt');
-const { isAdminRole } = require('../middlewares/user-roles');
-const isUserState = require('../middlewares/user-state');
-const isSameUserId = require('../middlewares/user-id');
 
-const { 
-	isNotEmailDB,
-	isUserIdDB,
-} = require('../helpers/validate-user');
+const { isNotEmailDB } = require('../helpers/validate-user');
+
+const validateJWT = require('../middlewares/validate-jwt');
+const { isAdminRole, isSameUserId, isUserId } = require('../middlewares/user');
 
 const {	
 	getUsers,
@@ -22,22 +17,16 @@ const {
 	deleteUser
 } = require('../controllers/users');
 
-const {User} = require('../models')
 
 router.get('/',[
 	validateJWT,
-	isUserState,
 	isAdminRole,
-	isValidations
 ], getUsers);
 
-// id
-// email
+// id, email
 router.get('/:info',[
 	validateJWT,
-	isUserState,
 	isAdminRole,
-	isValidations
 ], getUser);
 
 router.post('/',[
@@ -51,29 +40,18 @@ router.post('/',[
 	isValidations
 ] , postUser);
 
-// name
-// state
+// name, state
 router.put('/:id', [
 	validateJWT,
-	isUserState,
 	isSameUserId,
-	check('name', 'the name is required').not().isEmpty(),
-	isValidations
 ] , putUser);
 
 
 // admin role
 router.delete('/:id', [
 	validateJWT,
-	isUserState,
 	isAdminRole,
-	check('id', 'invalid id').isMongoId(),
-	//check('id').custom(isUserIdDB),
-	check('id').custom(async(id) => {
-		const {state} = await User.findById(id);
-		if(!state) throw new Error(`the ID ${id} not exists`);
-	}),
-	isValidations
+	isUserId
 ], deleteUser);
 
 module.exports = router;

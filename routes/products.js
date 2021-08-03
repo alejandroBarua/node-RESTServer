@@ -7,8 +7,7 @@ const { check } = require('express-validator');
 
 const { isValidations } = require('../middlewares/validations');
 const validateJWT = require('../middlewares/validate-jwt');
-const { isAdminRole } = require('../middlewares/user-roles');
-const isUserState = require('../middlewares/user-state');
+const { isAdminRole } = require('../middlewares/user');
 const isProductOfUser = require('../middlewares/user-product');
 
 const { isProductState } = require('../helpers/validate-product');
@@ -35,7 +34,6 @@ router.get('/:id',[
 
 router.post('/', [
 	validateJWT,
-	isUserState,
 	check('name', 'the name is required').not().isEmpty(),
 	check('category', 'the category is required').not().isEmpty(),
 	check('category', 'invalid id').isMongoId(),
@@ -48,7 +46,6 @@ router.post('/', [
 
 router.put('/:id', [
 	validateJWT,
-	isUserState,
 	isProductOfUser,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isProductState),
@@ -63,7 +60,6 @@ router.put('/:id', [
 
 router.delete('/:id',[
 	validateJWT,
-	isUserState,
 	isAdminRole,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isProductState),

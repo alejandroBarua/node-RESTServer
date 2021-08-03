@@ -9,7 +9,10 @@ const validateJWT = async(req, res, next) => {
 	try {
 		
 		const { id } = jwt.verify(token, process.env.SECRET_KEY);
-		req.user = await User.findById(id);
+		const user = await User.findById(id);
+
+		if(!user.state) return res.status(401).json({msg: 'user was deleted'});
+		req.user = user;
 
 		next();
 

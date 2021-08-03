@@ -5,8 +5,7 @@ const { check } = require('express-validator');
 
 const { isValidations } = require('../middlewares/validations');
 const validateJWT = require('../middlewares/validate-jwt');
-const { isAdminRole } = require('../middlewares/user-roles');
-const isUserState = require('../middlewares/user-state');
+const { isAdminRole } = require('../middlewares/user');
 
 const { isCategoryState, isNotCategoryDB } = require('../helpers/validate-category');
 
@@ -33,7 +32,6 @@ router.get('/:id',[
 // admin role
 router.post('/', [
 	validateJWT,
-	isUserState,
 	isAdminRole,
 	check('name', 'the name is required').not().isEmpty(),
 	check('name').custom(isNotCategoryDB),
@@ -43,7 +41,6 @@ router.post('/', [
 // admin role
 router.put('/:id',[
 	validateJWT,
-	isUserState,
 	isAdminRole,
 	check('id', 'invalid id').isMongoId(),
 	check('name').custom(isNotCategoryDB),
@@ -53,7 +50,6 @@ router.put('/:id',[
 // admin role
 router.delete('/:id',[
 	validateJWT,
-	isUserState,
 	isAdminRole,
 	check('id', 'invalid id').isMongoId(),
 	check('id').custom(isCategoryState),

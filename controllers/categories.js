@@ -64,8 +64,9 @@ const deleteCategory = async(req, res) => {
 	
 	const {id} = req.params;
 
-	const category = await Category.findByIdAndUpdate(id, {state: false});
-	await Product.updateMany({ category: id }, {state: false});
+	const query = {state: false};
+	const category = await Category.findByIdAndUpdate(id, query);
+	await Product.updateMany({ category: id }, query);
 
 	res.json({
 		category

@@ -6,7 +6,7 @@ const search = async(req, res) => {
 	const {since = 0, limit = 10, category = '', product = ''} = req.query;
 	
 	if(ObjectId.isValid(product)){
-		const products = await Product.find({_id: product, state: true})
+		const products = await Product.findOne({_id: product, state: true})
 																	.populate('user', 'name')
 		
 		return res.json({

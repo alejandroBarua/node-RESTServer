@@ -72,7 +72,9 @@ const putProduct = async(req, res) => {
 const deleteProduct = async(req, res) => {
 	
 	const {id} = req.params;
-	const product = await Product.findByIdAndUpdate(id, {state: false});
+
+	const query = {state: false};
+	const product = await Product.findByIdAndUpdate(id, query);
 
 	res.json({
 		product

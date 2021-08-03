@@ -9,8 +9,9 @@ const login = async(req, res) => {
 
 	try {
 		
-		const user = await User.findOne({ email });
-		if(!user || !user.state) return res.status(400).json({msg: 'the email and password are not valid'});
+		const query = { email, state: true };
+		const user = await User.findOne(query);
+		if(!user) return res.status(400).json({msg: 'the email and password are not valid'});
 		
 		const validPassword = bcryptjs.compareSync(password, user.password);
 		if(!validPassword) return res.status(400).json({msg: 'the email and password are not valid'});
@@ -35,8 +36,8 @@ const googleSignIn = async(req, res) => {
 	
 	try {
 		const {name, email, img} = await googleVerify(id_token);
-
-		let user = await User.findOne({email});
+		const query = { email, state: true };
+		let user = await User.findOne(query);
 		
 		if(!user){
 			const data = {
