@@ -1,30 +1,78 @@
+const { User, Image } = require('../models');
 
-const validTypes = ['png', 'jpg', 'jpeg'];
+const maxFiles = (id, collection, files, max) => {
+	
+	return new Promise(async(resolve, reject) => {
+
+		const countFiles = files.length;
+		
+		if(countFiles > max) return reject('maximum files reached');
+
+		const query = { _id: id, state: true};
+		const msg = 'the file could not be uploaded';
+
+		switch (collection) {
+			case 'user':
+			const {image} = await User.findOne(query);
+			if(image) return reject(msg);
+			break;
+			case 'product':
+			const countImagesDB = await Image.countDocuments({product: id});
+			const diference = max - countImagesDB;
+			if(diference < countFiles) return reject(msg);
+			break;
+		}
+		
+		resolve();
+	})
+}
+
+const isValidtype = (validTypes, files) => {
+
+	return new Promise((resolve, reject) => {
+		
+		let result = true;
+		
+		files.forEach(file => {
+			const type = file.mimetype.split('/')[1];
+			if(!validTypes.includes(type)) result = false;
+		})
+		if(!result) return reject('file type error');
+
+		resolve();
+	})
+}
+
+
+
+const imageTypes = ['png', 'jpg', 'jpeg'];
 
 const isValidFiles = async(req, res, next) => {
 	
-	const { collection } = req.params;
+	const { id, collection } = req.params;
 	// console.log(req.files); // name, size, tempFilePath, mimetype, mv()
+	if( !req.files ) return res.status(400).json({msg: 'no files were uploaded'});
 	
-	if( !req.files || Object.keys(req.files).length === 0){
-		return res.status(400).json({ msg: 'No files were uploaded' });
-	}
-	
-	if( collection === 'user' && Object.keys(req.files).length !== 1){
-		return res.status(400).json({ msg: 'Only one image can be uploaded for the user' });
-	}
-	
-	if( collection === 'product' && Object.keys(req.files).length > 3){
-		return res.status(400).json({ msg: 'Only maximum five images can be uploaded for the product' });
-	}
-	
-	let isvalidType = true;
+	const files = Object.values(req.files)[0].length
+								? Object.values(req.files)[0]
+								: Object.values(req.files);
 
-	Object.values(req.files).forEach(el => {
-		const type = el.mimetype.split('/')[1];
-		if(!validTypes.includes(type)) isvalidType = false;
-	})
-	if(!isvalidType) return res.status(400).json({ msg: 'file type error' });
+	try {
+		
+		switch (collection) {
+			case 'user':
+				await maxFiles(id, collection, files, 1);
+				await isValidtype(imageTypes, files);
+				break;
+			case 'product':
+				await maxFiles(id, collection, files, 3);
+				await isValidtype(imageTypes, files);
+				break;
+		}
+
+	} catch (err) {
+		return res.status(400).json({msg: err});
+	}
 
 	next();
 }

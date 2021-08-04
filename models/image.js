@@ -5,11 +5,7 @@ const imageSchema = Schema({
 		type: String,
 		require: true
 	},
-	state: {
-		type: Boolean,
-		default: true
-	},
-	user: {
+	product: {
 		type: Schema.Types.ObjectId,
 		ref: 'Product',
 		require: true
